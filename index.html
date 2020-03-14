@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game</title>
+</head>
+<body>
+<div style="margin: 5px 0 5px; padding: 5px; background-color: blanchedalmond; display: flex; flex-direction: row; justify-content: space-around; border: 2px ridge;" id="game-field">
+    <div style="display: flex; flex-direction: column" id="row-0"></div>
+    <div style="display: flex; flex-direction: column" id="row-1"></div>
+    <div style="display: flex; flex-direction: column" id="row-2"></div>
+    <div style="display: flex; flex-direction: column" id="row-3"></div>
+    <div style="display: flex; flex-direction: column" id="row-4"></div>
+</div>
+<div>
+    <div style="margin: 5px 0 5px; width: 100px; padding: 2px; background-color: aquamarine; border: 1px solid gold"><strong>Balance</strong><br>
+        <span>Bit:</span>
+        <span id="bit">100</span>
+    <div>
+        <span>Win:</span>
+        <span id="win">0</span>
+    </div>
+    </div>
+</div>
+    <button id="btn">Start</button>
+<script>
+    let button = document.getElementById("btn");
+    let bit = document.getElementById("bit");
+    let bitValue = +bit.innerText;
+    let win = document.getElementById("win");
+    winValue = +win.innerText;
+    button.addEventListener("click", function () {
+        if (bitValue > 0){
+            bitValue -= 10;
+            bit.innerText = bitValue;
+            fetch('/game')
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log("data", data);
+                    data.spinResult.map((elem, index) => {
+                        let row = document.getElementById(`row-${index}`);
+                        row.innerHTML = "";
+                        for (let i = 0; i < elem.length; i++){
+                            let div = document.createElement("div");
+                            div.className = "td";
+                            div.innerHTML = `<span>${elem[i]}</span>`;
+                            row.appendChild(div)
+                        }
+                    });
+                    if (data.winlines.length > 0){
+                        data.winlines.map(elem =>{
+                            for (let i = 0; i < data.spinResult.length; i++){
+                                let row = document.getElementById(`row-${i}`);
+                                row.getElementsByClassName("td")[elem].style.backgroundColor = "red"
+                            }
+                            winValue += 10;
+                            win.innerText = winValue;
+                        })
+                    }
+                })
+        } else {
+            alert("Закончились деньги на счете :(")
+        }
+    })
+</script>
+</body>
+</html>
